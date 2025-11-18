@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>基于Git的代码版本管理与多人协作</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="一份详细的Git和Gitea协作教程，适合从零开始学习版本管理和团队协作">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  
+  <!-- 主题样式 -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  
+  <!-- 自定义样式 -->
+  <style>
+    :root {
+      --base-font-size: 16px;
+      --theme-color: #42b983;
+      --theme-color-dark: #33a06f;
+    }
+    
+    /* 优化代码块样式 */
+    .markdown-section pre {
+      background-color: #f8f8f8;
+      border-radius: 4px;
+      padding: 0.8em 1em;
+      margin: 0.5em 0;
+    }
+    
+    /* 代码块容器 */
+    .markdown-section pre code {
+      padding: 0;
+    }
+    
+    /* 优化表格样式 */
+    .markdown-section table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1em 0;
+    }
+    
+    .markdown-section table th {
+      background-color: var(--theme-color);
+      color: white;
+      font-weight: bold;
+    }
+    
+    .markdown-section table tr:nth-child(even) {
+      background-color: #f8f8f8;
+    }
+    
+    /* 优化图片样式 */
+    .markdown-section img {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 100%;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .markdown-section img:hover {
+      transform: scale(1.02);
+    }
+    
+    /* SVG图片样式优化 */
+    .markdown-section img[src$=".svg"] {
+      background-color: transparent;
+      box-shadow: none;
+      border-radius: 0;
+    }
+    
+    .markdown-section img[src$=".svg"]:hover {
+      transform: none;
+    }
+    
+    /* 优化侧边栏 */
+    .sidebar {
+      border-right: 1px solid #eee;
+    }
+    
+    .sidebar-nav > ul > li > a {
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    
+    /* 返回顶部按钮样式 */
+    .back-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background-color: var(--theme-color);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      z-index: 999;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+    }
+    
+    .back-to-top:hover {
+      background-color: var(--theme-color-dark);
+      transform: translateY(-2px);
+    }
+    
+    /* 优化搜索框 */
+    .search input {
+      border-radius: 20px;
+    }
+    
+    /* 优化分页导航 */
+    .docsify-pagination-container {
+      margin-top: 3em;
+    }
+    
+    /* 隐藏自动生成的目录 */
+    .markdown-section .app-sub-sidebar {
+      display: none !important;
+    }
+    
+    /* 隐藏可能出现的自动目录 */
+    .sidebar .app-sub-sidebar,
+    .sidebar ul.app-sub-sidebar {
+      display: none !important;
+    }
+    
+    /* 确保只显示手动配置的侧边栏 */
+    .sidebar > ul:not(:first-child) {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">加载中...</div>
+  
+  <!-- 返回顶部按钮 -->
+  <div class="back-to-top" onclick="scrollToTop()">↑</div>
+  
+  <script>
+    // Docsify配置
+    window.$docsify = {
+      name: '基于Git的代码版本管理与多人协作',
+      repo: '',
+      loadSidebar: true,
+      autoHeader: false,  // 禁用自动目录，避免与侧边栏重复
+      subMaxLevel: 0,  // 设置为0完全禁用自动目录
+      homepage: 'README.md',
+      
+      // 搜索插件配置（中文优化）
+      search: {
+        maxAge: 86400000, // 过期时间，单位毫秒，默认一天
+        paths: 'auto',
+        placeholder: '🔍 搜索文档...',
+        noData: '😞 没有找到结果！',
+        depth: 6,
+        hideOtherSidebarContent: false,
+        namespace: 'gitea-guide',
+      },
+      
+      // 代码复制插件配置
+      copyCode: {
+        buttonText: '📋 复制',
+        errorText: '❌ 复制失败',
+        successText: '✅ 已复制'
+      },
+      
+      // 分页导航配置
+      pagination: {
+        previousText: '⬅️ 上一章',
+        nextText: '下一章 ➡️',
+        crossChapter: true,
+        crossChapterText: true,
+      },
+      
+      // 字数统计配置
+      count: {
+        countable: true,
+        fontsize: '0.9em',
+        color: 'rgb(90,90,90)',
+        language: 'chinese',
+        localization: {
+          words: "字",
+          minute: "分钟"
+        },
+        isExpected: true
+      },
+      
+      // 图片缩放配置
+      zoom: {
+        selector: '.markdown-section img',
+        background: 'rgba(0,0,0,0.8)',
+        delay: 300,
+      },
+      
+      // 代码高亮主题
+      themeColor: '#42b983',
+      
+      // 格式化更新时间
+      formatUpdated: '{YYYY}-{MM}-{DD} {HH}:{mm}',
+      
+      // 404页面
+      notFoundPage: true,
+      
+      // 外链打开方式
+      externalLinkTarget: '_blank',
+      
+      // 顶部横幅
+      topMargin: 0,
+      
+      // 插件：修复锚点跳转（支持跨文件链接）
+      plugins: [
+        function(hook) {
+          hook.doneEach(function() {
+            // 修复侧边栏锚点链接（包括跨文件链接）
+            setTimeout(function() {
+              const links = document.querySelectorAll('.sidebar a[href]');
+              links.forEach(function(link) {
+                if (!link.hasAttribute('data-fixed')) {
+                  link.setAttribute('data-fixed', 'true');
+                  link.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href && href !== '#' && href !== '/') {
+                      // 处理跨文件链接（如：01-第一部分.md#锚点）
+                      if (href.includes('#') && !href.startsWith('#')) {
+                        const [filePath, anchor] = href.split('#');
+                        // Docsify 会自动处理文件跳转，我们只需要确保锚点正确
+                        // 让 Docsify 正常处理文件跳转，然后滚动到锚点
+                        setTimeout(function() {
+                          if (anchor) {
+                            const targetId = decodeURIComponent(anchor);
+                            let targetElement = document.getElementById(targetId) || 
+                                               document.querySelector('[name="' + targetId + '"]');
+                            
+                            // 如果找不到，尝试模糊匹配
+                            if (!targetElement) {
+                              const headings = document.querySelectorAll('h1, h2, h3, h4');
+                              headings.forEach(function(heading) {
+                                const headingId = (heading.id || heading.getAttribute('name') || '').toLowerCase();
+                                if (headingId === targetId.toLowerCase() || 
+                                    headingId.includes(targetId.toLowerCase()) ||
+                                    targetId.toLowerCase().includes(headingId)) {
+                                  targetElement = heading;
+                                }
+                              });
+                            }
+                            
+                            if (targetElement) {
+                              targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                              window.location.hash = '#' + anchor;
+                            }
+                          }
+                        }, 300);
+                      } else if (href.startsWith('#')) {
+                        // 处理同文件内的锚点链接
+                        const targetId = decodeURIComponent(href.substring(1));
+                        let targetElement = document.getElementById(targetId) || 
+                                           document.querySelector('[name="' + targetId + '"]');
+                        
+                        // 如果找不到，尝试模糊匹配
+                        if (!targetElement) {
+                          const headings = document.querySelectorAll('h1, h2, h3, h4');
+                          headings.forEach(function(heading) {
+                            const headingId = (heading.id || heading.getAttribute('name') || '').toLowerCase();
+                            if (headingId === targetId.toLowerCase()) {
+                              targetElement = heading;
+                            }
+                          });
+                        }
+                        
+                        if (targetElement) {
+                          e.preventDefault();
+                          targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          window.location.hash = href;
+                        }
+                      }
+                    }
+                  });
+                }
+              });
+            }, 200);
+          });
+        }
+      ],
+    }
+    
+    // 返回顶部功能
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+    
+    // 显示/隐藏返回顶部按钮
+    window.addEventListener('scroll', function() {
+      const btn = document.querySelector('.back-to-top');
+      if (window.pageYOffset > 300) {
+        btn.style.display = 'block';
+      } else {
+        btn.style.display = 'none';
+      }
+    });
+    
+  </script>
+  
+  <!-- Docsify核心 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  
+  <!-- 搜索插件 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  
+  <!-- 代码复制插件 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@2/dist/docsify-copy-code.min.js"></script>
+  
+  <!-- 图片缩放插件 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/zoom-image.min.js"></script>
+  
+  <!-- 分页导航插件 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination@2/dist/docsify-pagination.min.js"></script>
+  
+  <!-- 字数统计插件 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-count@latest/dist/countable.min.js"></script>
+  
+  <!-- 代码高亮 - Bash -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  
+  <!-- 代码高亮 - Git -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-git.min.js"></script>
+  
+  <!-- 代码高亮 - Python -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
+  
+  <!-- 代码高亮 - JavaScript -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-javascript.min.js"></script>
+  
+  <!-- 代码高亮 - Markdown -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
+  
+  <!-- Emoji支持 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/emoji.min.js"></script>
+  
+  <!-- 外链脚本 - 新标签打开 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/external-script.min.js"></script>
+</body>
+</html>
+

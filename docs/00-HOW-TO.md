@@ -120,10 +120,25 @@
    - 选择 `base: develop`（目标分支）、`compare: feature/login-otp`（源分支）
    - 填写 PR 模板（相关 Issue、测试、截图等），说明修改内容和测试情况
 
+6. **PR 合并后清理分支**
+   ```bash
+   # PR 被接受合并后，回到 develop 分支并更新
+   git checkout develop
+   git pull origin develop
+   
+   # 删除本地分支
+   git branch -d feature/login-otp   # -d 表示安全删除，确保分支已合并
+   
+   # 删除远程分支
+   git push origin --delete feature/login-otp
+   ```
+   **注意**：及时删除已合并的分支是良好习惯，避免分支堆积造成混乱
+
 **注意事项**
 - 提交信息遵循团队规范（见第四部分）
 - 一次 PR 专注一件事，确保有测试或截图
 - 处理完 review 意见后再次 `push`，PR 会自动更新
+- **PR 合并后务必删除分支，保持仓库整洁**
 
 ---
 

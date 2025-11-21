@@ -128,6 +128,21 @@
     .sidebar > ul:not(:first-child) {
       display: none;
     }
+    
+    /* Mermaid 图表样式 */
+    .mermaid {
+      text-align: center;
+      margin: 1.5em 0;
+      background-color: #f8f8f8;
+      padding: 1em;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    
+    .mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
   </style>
 </head>
 <body>
@@ -144,7 +159,7 @@
       loadSidebar: false,
       autoHeader: true,  // 禁用自动目录，避免与侧边栏重复
       subMaxLevel: 3,  // 设置为0完全禁用自动目录
-      homepage: 'README.md',
+      homepage: 'index.md',
       
       // 搜索插件配置（中文优化）
       search: {
@@ -207,10 +222,94 @@
       // 顶部横幅
       topMargin: 0,
       
-      // 插件：修复锚点跳转（支持跨文件链接）
+      // 插件：修复锚点跳转（支持跨文件链接）和 Mermaid 支持
       plugins: [
         function(hook) {
+          // Mermaid 初始化
+          hook.beforeEach(function(html) {
+            // 在渲染前，将 mermaid 代码块标记出来
+            return html;
+          });
+          
           hook.doneEach(function() {
+            // 初始化 Mermaid
+            if (typeof mermaid !== 'undefined') {
+              // 查找所有 mermaid 代码块
+              const mermaidBlocks = document.querySelectorAll('pre code.language-mermaid, pre code.lang-mermaid');
+              mermaidBlocks.forEach(function(block) {
+                const parent = block.parentElement;
+                if (parent && !parent.classList.contains('mermaid-processed')) {
+                  parent.classList.add('mermaid-processed');
+                  
+                  // 获取代码内容
+                  const code = block.textContent || block.innerText || '';
+                  
+                  // 创建 mermaid 容器
+                  const mermaidContainer = document.createElement('div');
+                  mermaidContainer.className = 'mermaid';
+                  mermaidContainer.textContent = code.trim();
+                  
+                  // 替换代码块
+                  if (parent.parentElement) {
+                    parent.parentElement.replaceChild(mermaidContainer, parent);
+                  }
+                }
+              });
+              
+              // 初始化 mermaid（如果还没有初始化）
+              if (!window.mermaidInitialized) {
+                try {
+                  mermaid.initialize({ 
+                    startOnLoad: false,  // 手动控制渲染
+                    theme: 'default',
+                    securityLevel: 'loose',
+                    flowchart: {
+                      useMaxWidth: true,
+                      htmlLabels: true,
+                      curve: 'basis'
+                    },
+                    sequence: {
+                      diagramMarginX: 50,
+                      diagramMarginY: 10,
+                      actorMargin: 50,
+                      width: 150,
+                      height: 65,
+                      boxMargin: 10,
+                      boxTextMargin: 5,
+                      noteMargin: 10,
+                      messageMargin: 35
+                    }
+                  });
+                  window.mermaidInitialized = true;
+                } catch (e) {
+                  console.warn('Mermaid 初始化错误:', e);
+                }
+              }
+              
+              // 渲染所有 mermaid 图表
+              try {
+                const mermaidElements = document.querySelectorAll('.mermaid:not([data-processed])');
+                if (mermaidElements.length > 0) {
+                  // 使用 mermaid.run() 或 mermaid.contentLoaded() 取决于版本
+                  if (typeof mermaid.run === 'function') {
+                    mermaid.run({
+                      nodes: mermaidElements
+                    });
+                  } else if (typeof mermaid.contentLoaded === 'function') {
+                    mermaid.contentLoaded();
+                  } else {
+                    // 兼容旧版本，直接初始化
+                    mermaid.init(undefined, mermaidElements);
+                  }
+                  mermaidElements.forEach(function(el) {
+                    el.setAttribute('data-processed', 'true');
+                  });
+                }
+              } catch (e) {
+                console.warn('Mermaid 渲染错误:', e);
+              }
+            }
+            
             // 修复侧边栏锚点链接（包括跨文件链接）
             setTimeout(function() {
               const links = document.querySelectorAll('.sidebar a[href]');
@@ -341,6 +440,9 @@
   
   <!-- 外链脚本 - 新标签打开 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/external-script.min.js"></script>
+  
+  <!-- Mermaid 图表库 -->
+  <script src="//cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 </body>
 </html>
 

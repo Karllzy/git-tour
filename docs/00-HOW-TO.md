@@ -1,7 +1,6 @@
 ## HOW TO 快速上手
 
 > 还没准备好读完全部章节？先从这里开始，按你的角色快速上手最常用的操作。
-
 ---
 
 ### 场景 A：旧代码上传
@@ -104,8 +103,24 @@
    ```bash
    git status                                      # 查看文件状态，确认修改的文件
    git add src/login.js                            # 只添加修改的登录文件到暂存区
-   git commit -m "feat(login): 支持 OTP 登录"       # 提交变更，使用规范格式：feat+模块+描述
+   git commit -m "feat(login): 支持 OTP 登录"       # 提交变更，使用规范格式：类型+模块+描述，模块可以不填
    ```
+   提交类型可以包括：
+   | 类型type               | 说明     | 游戏比喻      | 示例                            |
+   | ------------------ | -------- | ------------- | ------------------------------- |
+   | **feat**     | 新功能   | 🎯 完成新任务 | `feat: 添加用户注册功能`      |
+   | **fix**      | 修复bug  | 🐛 修复bug    | `fix: 修复登录页面崩溃问题`   |
+   | **docs**     | 文档变更 | 📖 更新攻略   | `docs: 更新README安装说明`    |
+   | **style**    | 代码格式 | 💄 装饰外观   | `style: 统一代码缩进为2空格`  |
+   | **refactor** | 重构代码 | 🔧 重整装备   | `refactor: 重构用户认证模块`  |
+   | **perf**     | 性能优化 | ⚡ 提升速度   | `perf: 优化首页查询性能`      |
+   | **test**     | 测试相关 | ✅ 测试验证   | `test: 添加登录功能单元测试`  |
+   | **build**    | 构建系统 | 🔨 构建工具   | `build: 升级webpack到5.0`     |
+   | **ci**       | CI配置   | 🤖 自动化     | `ci: 添加GitHub Actions配置`  |
+   | **chore**    | 其他杂项 | 🧹 杂务       | `chore: 更新依赖包版本`       |
+   | **revert**   | 回滚提交 | ⏪ 读取存档   | `revert: 回滚feat(login)提交` |
+
+
 4. **保持分支同步**
    ```bash
    git fetch origin              # 获取远程仓库最新信息，但不合并到本地
@@ -120,10 +135,25 @@
    - 选择 `base: develop`（目标分支）、`compare: feature/login-otp`（源分支）
    - 填写 PR 模板（相关 Issue、测试、截图等），说明修改内容和测试情况
 
+6. **PR 合并后清理分支**
+   ```bash
+   # PR 被接受合并后，回到 develop 分支并更新
+   git checkout develop
+   git pull origin develop
+   
+   # 删除本地分支
+   git branch -d feature/login-otp   # -d 表示安全删除，确保分支已合并
+   
+   # 删除远程分支
+   git push origin --delete feature/login-otp
+   ```
+   **注意**：及时删除已合并的分支是良好习惯，避免分支堆积造成混乱
+
 **注意事项**
 - 提交信息遵循团队规范（见第四部分）
 - 一次 PR 专注一件事，确保有测试或截图
 - 处理完 review 意见后再次 `push`，PR 会自动更新
+- **PR 合并后务必删除分支，保持仓库整洁**
 
 ---
 
@@ -135,7 +165,7 @@
 1. **分支治理**
    - `main`：线上稳定版本，只接收 release/hotfix（长期分支）
    - `develop`：集成测试环境，新功能合入此分支（长期分支）
-   - `feature/*`：功能开发，完成后合入 `develop`，然后赶紧删掉这个临时分支避免项目混乱
+   - `feature/*`：功能开发，完成后合入 `develop`，使用-作为空格例如add-sign-up，尽量使用英文。
    - `release/*`：发布前的稳定候选，完成后合入 `main & develop`，也要删掉
    - `hotfix/*`：线上紧急修复，完成后合入 `main & develop`，要删掉，临时的
 2. **每日例行**

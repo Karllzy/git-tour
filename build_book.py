@@ -31,9 +31,8 @@ def read_file(filepath):
 
 def fix_image_paths(content, source_dir):
     """修复图片路径，从相对路径改为相对于 docs/assets 的路径"""
-    # 如果内容中包含 ./assets/ 或 assets/，需要调整为 docs/assets/
+    # 将 ./assets/ 替换为 docs/assets/
     content = content.replace('./assets/', 'docs/assets/')
-    content = content.replace('assets/', 'docs/assets/')
     return content
 
 def fix_links(content):
@@ -45,8 +44,8 @@ def fix_links(content):
         text = match.group(1)  # 链接文本
         link = match.group(2)   # 链接路径
         
-        # 如果链接指向 docs/ 目录下的文件，转换为锚点链接
-        if link.startswith('docs/') or link.startswith('./docs/'):
+        # 如果链接指向 docs/ 目录下的 .md 文件，转换为锚点链接
+        if (link.startswith('docs/') or link.startswith('./docs/')) and '.md' in link:
             # 提取锚点部分
             if '#' in link:
                 anchor = '#' + link.split('#', 1)[1]

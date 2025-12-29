@@ -106,7 +106,7 @@ def build_book():
         if 'docs/' in doc_path:
             content = fix_image_paths(content, doc_path)
         
-        # 修复链接（转换为文档内锚点）
+        # 修复链接（转换为文档内锚点） benlaishimark
         content = fix_links(content)
         
         # 提升标题级别（一级标题保持不变）
